@@ -1,7 +1,9 @@
 package com.osu.michja56.backend.config;
 
 import com.osu.michja56.backend.model.Product;
+import com.osu.michja56.backend.model.User; // Nový import
 import com.osu.michja56.backend.repository.ProductRepository;
+import com.osu.michja56.backend.repository.UserRepository; // Nový import
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,31 +15,43 @@ import java.util.List;
 public class DataInitializer {
 
     @Bean
-    CommandLineRunner initDatabase(ProductRepository repository) {
+    CommandLineRunner initDatabase(ProductRepository productRepo, UserRepository userRepo) {
         return args -> {
-            if (repository.count() == 0) {
+            // --- INICIALIZACE PRODUKTŮ ---
+            if (productRepo.count() == 0) {
                 Product p1 = new Product();
-                p1.setName("Herní notebook");
-                p1.setDescription("Výkonný notebook pro práci i zábavu.");
+                p1.setName("Herní Notebook");
                 p1.setPrice(new BigDecimal("25000.00"));
                 p1.setImageUrl("https://placehold.co/400x400?text=Notebook");
 
                 Product p2 = new Product();
                 p2.setName("Mechanická klávesnice");
-                p2.setDescription("RGB podsvícení a tiché spínače.");
                 p2.setPrice(new BigDecimal("1800.00"));
                 p2.setImageUrl("https://placehold.co/400x400?text=Klavesnice");
 
-                Product p3 = new Product();
-                p3.setName("Bezdrátová myš");
-                p3.setDescription("Ergonomický design a dlouhá výdrž.");
-                p3.setPrice(new BigDecimal("950.00"));
-                p3.setImageUrl("https://placehold.co/400x400?text=Mys");
+                productRepo.saveAll(List.of(p1, p2));
+                System.out.println(">> Produkty vloženy.");
+            }
 
-                repository.saveAll(List.of(p1, p2, p3));
-                System.out.println(">> Databáze byla úspěšně naplněna ukázkovými produkty.");
-            } else {
-                System.out.println(">> Produkty již v databázi existují, přeskakuji inicializaci.");
+            // --- INICIALIZACE UŽIVATELŮ ---
+            if (userRepo.count() == 0) {
+                // Admin
+                User admin = new User();
+                admin.setUsername("admin");
+                admin.setPassword("admin123");
+                admin.setEmail("admin@eshop.cz");
+                admin.setRole("ADMIN");
+                userRepo.save(admin);
+
+                // Běžný uživatel
+                User user = new User();
+                user.setUsername("pepa");
+                user.setPassword("pepa123");
+                user.setEmail("pepa@email.cz");
+                user.setRole("USER");
+                userRepo.save(user);
+
+                System.out.println(">> Testovací uživatelé vytvořeni (admin/admin123, pepa/pepa123).");
             }
         };
     }
