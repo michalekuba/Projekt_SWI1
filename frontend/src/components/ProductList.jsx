@@ -44,7 +44,9 @@ const ProductList = ({ user }) => {
                             <h5 className="card-title fw-bold">{product.name}</h5>
                             <p className="card-text text-muted small">{product.description}</p>
                             <div className="d-flex justify-content-between align-items-center mt-3">
-                                <span className="h5 mb-0 text-success">{product.price} Kč</span>
+                                <span className="h5 mb-0 text-success">
+                                    {Number(product.price).toLocaleString('cs-CZ')} Kč
+                                </span>
                                 <button className="btn btn-outline-primary btn-sm">Detail</button>
                             </div>
                             {user?.role === 'ADMIN' && (
