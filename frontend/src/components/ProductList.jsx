@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const ProductList = () => {
-    // Stav pro uložení produktů
+const ProductList = ({ user }) => {
     const [products, setProducts] = useState([]);
-    // Stav pro ošetření načítání (nepovinné, ale profi)
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        // Volání tvého Java API
+    const loadProducts = () => {
         axios.get('http://localhost:8080/api/products')
             .then(response => {
                 setProducts(response.data);
@@ -18,7 +15,18 @@ const ProductList = () => {
                 console.error('Chyba při komunikaci s backendem:', error);
                 setLoading(false);
             });
+    };
+
+    useEffect(() => {
+        loadProducts();
     }, []);
+
+    const handleDelete = (id) => {
+        if (!window.confirm('Opravdu chcete smazat tento produkt?')) return;
+        axios.delete(`http://localhost:8080/api/products/${id}`)
+            .then(() => loadProducts())
+            .catch(error => console.error('Chyba při mazání:', error));
+    };
 
     if (loading) return <div className="text-center">Načítám produkty...</div>;
 
@@ -27,7 +35,6 @@ const ProductList = () => {
             {products.map(product => (
                 <div key={product.id} className="col-md-4 mb-4">
                     <div className="card h-100 shadow-sm">
-                        {/* Použijeme imageUrl z naší Java entity */}
                         <img
                             src={product.imageUrl || "https://placehold.co/400x400?text=Bez+obrazku"}
                             className="card-img-top"
@@ -35,13 +42,19 @@ const ProductList = () => {
                         />
                         <div className="card-body">
                             <h5 className="card-title fw-bold">{product.name}</h5>
-                            <p className="card-text text-muted small">
-                                {product.description}
-                            </p>
+                            <p className="card-text text-muted small">{product.description}</p>
                             <div className="d-flex justify-content-between align-items-center mt-3">
                                 <span className="h5 mb-0 text-success">{product.price} Kč</span>
                                 <button className="btn btn-outline-primary btn-sm">Detail</button>
                             </div>
+                            {user?.role === 'ADMIN' && (
+                                <button
+                                    className="btn btn-danger btn-sm w-100 mt-2"
+                                    onClick={() => handleDelete(product.id)}
+                                >
+                                    🗑 Smazat produkt
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

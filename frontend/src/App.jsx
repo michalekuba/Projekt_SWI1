@@ -36,7 +36,7 @@ function App() {
                     <div className="row">
                         <div className={user?.role === 'ADMIN' ? "col-lg-8" : "col-12"}>
                             <h2 className="fw-light mb-4">Naše nabídka</h2>
-                            <ProductList key={refreshKey} />
+                            <ProductList key={refreshKey} user={user} />
                         </div>
 
                         {user?.role === 'ADMIN' && (

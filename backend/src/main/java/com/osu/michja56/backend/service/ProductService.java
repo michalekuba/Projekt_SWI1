@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductService {
+public class    ProductService {
 
     private final ProductRepository productRepository;
 
@@ -26,5 +26,8 @@ public class ProductService {
 
     public Product createProduct(Product product) {
         return productRepository.save(product);
+    }
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
     }
 }
