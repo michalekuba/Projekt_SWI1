@@ -15,6 +15,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import static org.mockito.Mockito.doNothing;
+
 class ProductServiceTest {
 
     @Mock
@@ -74,5 +76,17 @@ class ProductServiceTest {
         // Ověření (Assert)
         assertNotNull(saved);
         assertEquals("Novinka", saved.getName());
+    }
+
+    @Test
+    void testDeleteProduct() {
+        // Arrange
+        doNothing().when(productRepository).deleteById(1L);
+
+        // Act
+        productService.deleteProduct(1L);
+
+        // Assert
+        verify(productRepository, times(1)).deleteById(1L);
     }
 }
