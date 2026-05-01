@@ -47,6 +47,9 @@ function App() {
                     </div>
                 )}
             </div>
+            <footer className="text-center text-muted py-4 mt-5 border-top">
+                <small>© 2026 Můj E-shop · Vytvořeno v rámci předmětu SWI1</small>
+            </footer>
         </div>
     );
 }
