@@ -23,11 +23,13 @@ public class DataInitializer {
                 Product p1 = new Product();
                 p1.setName("Herní Notebook");
                 p1.setPrice(new BigDecimal("25000.00"));
+                p1.setStockQuantity(5);
                 p1.setImageUrl("https://placehold.co/400x400?text=Notebook");
 
                 Product p2 = new Product();
                 p2.setName("Mechanická klávesnice");
                 p2.setPrice(new BigDecimal("1800.00"));
+                p2.setStockQuantity(12);
                 p2.setImageUrl("https://placehold.co/400x400?text=Klavesnice");
 
                 productRepo.saveAll(List.of(p1, p2));

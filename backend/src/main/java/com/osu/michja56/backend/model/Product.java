@@ -23,6 +23,9 @@ public class Product {
     @Column(nullable = false)
     private BigDecimal price;
 
+    @Column(nullable = false)
+    private Integer stockQuantity = 0;
+
     // URL adresa k obrázku produktu
     private String imageUrl;
 }

@@ -6,7 +6,8 @@ const AddProductForm = ({ onProductAdded }) => {
         name: '',
         description: '',
         price: '',
-        imageUrl: ''
+        imageUrl: '',
+        stockQuantity: 0
     });
 
     const handleSubmit = (e) => {
@@ -14,7 +15,7 @@ const AddProductForm = ({ onProductAdded }) => {
         axios.post('http://localhost:8080/api/products', product)
             .then(response => {
                 alert('Produkt úspěšně přidán!');
-                setProduct({ name: '', description: '', price: '', imageUrl: '' });
+                setProduct({ name: '', description: '', price: '', imageUrl: '', stockQuantity: 0 });
                 onProductAdded();
             })
             .catch(error => console.error('Chyba při přidávání produktu:', error));
@@ -36,6 +37,13 @@ const AddProductForm = ({ onProductAdded }) => {
                             <input
                                 type="number" className="form-control" placeholder="Cena" required
                                 value={product.price} onChange={e => setProduct({...product, price: e.target.value})}
+                            />
+                        </div>
+                        <div className="col-md-6">
+                            <input
+                                type="number" className="form-control" placeholder="Skladem" min="0" required
+                                value={product.stockQuantity}
+                                onChange={e => setProduct({...product, stockQuantity: Number(e.target.value)})}
                             />
                         </div>
                         <div className="col-12">

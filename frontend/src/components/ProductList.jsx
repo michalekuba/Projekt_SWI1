@@ -4,6 +4,7 @@ import axios from 'axios';
 const ProductList = ({ user }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [stockEdits, setStockEdits] = useState({});
 
     const loadProducts = () => {
         axios.get('http://localhost:8080/api/products')
@@ -28,6 +29,21 @@ const ProductList = ({ user }) => {
             .catch(error => console.error('Chyba při mazání:', error));
     };
 
+    const handleStockChange = (id, value) => {
+        setStockEdits(prev => ({ ...prev, [id]: value }));
+    };
+
+    const handleStockSave = (id) => {
+        const stockQuantity = Number(stockEdits[id]);
+        if (!Number.isInteger(stockQuantity) || stockQuantity < 0) {
+            alert('Zadejte nezáporné celé číslo.');
+            return;
+        }
+        axios.patch(`http://localhost:8080/api/products/${id}/stock`, { stockQuantity })
+            .then(() => loadProducts())
+            .catch(error => console.error('Chyba při ukládání skladu:', error));
+    };
+
     if (loading) return <div className="text-center">Načítám produkty...</div>;
 
     return (
@@ -49,6 +65,29 @@ const ProductList = ({ user }) => {
                                 </span>
                                 <button className="btn btn-outline-primary btn-sm">Detail</button>
                             </div>
+                            <div className="text-muted small mt-2">
+                                Skladem: {product.stockQuantity ?? 0} ks
+                            </div>
+                            {user?.role === 'ADMIN' && (
+                                <div className="mt-2">
+                                    <div className="input-group input-group-sm">
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            min="0"
+                                            value={stockEdits[product.id] ?? product.stockQuantity ?? 0}
+                                            onChange={e => handleStockChange(product.id, e.target.value)}
+                                        />
+                                        <button
+                                            className="btn btn-outline-success"
+                                            type="button"
+                                            onClick={() => handleStockSave(product.id)}
+                                        >
+                                            Uložit sklad
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                             {user?.role === 'ADMIN' && (
                                 <button
                                     className="btn btn-danger btn-sm w-100 mt-2"

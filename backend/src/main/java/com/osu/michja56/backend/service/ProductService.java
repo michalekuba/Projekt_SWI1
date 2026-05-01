@@ -27,6 +27,13 @@ public class    ProductService {
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }
+
+    public Optional<Product> updateStock(Long id, int stockQuantity) {
+        return productRepository.findById(id).map(product -> {
+            product.setStockQuantity(stockQuantity);
+            return productRepository.save(product);
+        });
+    }
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
