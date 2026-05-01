@@ -7,6 +7,7 @@ import com.osu.michja56.backend.repository.UserRepository; // Nový import
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -35,10 +36,11 @@ public class DataInitializer {
 
             // --- INICIALIZACE UŽIVATELŮ ---
             if (userRepo.count() == 0) {
+                BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
                 // Admin
                 User admin = new User();
                 admin.setUsername("admin");
-                admin.setPassword("admin123");
+                admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setEmail("admin@eshop.cz");
                 admin.setRole("ADMIN");
                 userRepo.save(admin);
@@ -46,7 +48,7 @@ public class DataInitializer {
                 // Běžný uživatel
                 User user = new User();
                 user.setUsername("pepa");
-                user.setPassword("pepa123");
+                user.setPassword(passwordEncoder.encode("pepa123"));
                 user.setEmail("pepa@email.cz");
                 user.setRole("USER");
                 userRepo.save(user);

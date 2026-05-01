@@ -1,8 +1,15 @@
 package com.osu.michja56.backend.controller;
 
+import com.osu.michja56.backend.dto.LoginRequest;
+import com.osu.michja56.backend.dto.RegisterRequest;
+import com.osu.michja56.backend.dto.UserResponse;
 import com.osu.michja56.backend.model.User;
 import com.osu.michja56.backend.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -13,19 +20,78 @@ import java.util.Optional;
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public AuthController(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User loginData) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginData) {
         Optional<User> user = userRepository.findByUsername(loginData.getUsername());
 
-        if (user.isPresent() && user.get().getPassword().equals(loginData.getPassword())) {
-            return ResponseEntity.ok(user.get());
+        if (user.isPresent() && passwordMatches(user.get(), loginData.getPassword())) {
+            return ResponseEntity.ok(UserResponse.from(user.get()));
         }
 
         return ResponseEntity.status(401).body("Neplatné jméno nebo heslo");
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest registerData) {
+        if (!StringUtils.hasText(registerData.getUsername())
+                || !StringUtils.hasText(registerData.getPassword())
+                || !StringUtils.hasText(registerData.getEmail())) {
+            return ResponseEntity.badRequest().body("Vyplňte uživatelské jméno, e-mail a heslo.");
+        }
+
+        if (userRepository.findByUsername(registerData.getUsername()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Uživatelské jméno už existuje.");
+        }
+
+        if (userRepository.findByEmail(registerData.getEmail()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("E-mail už existuje.");
+        }
+
+        User user = new User();
+        user.setUsername(registerData.getUsername().trim());
+        user.setPassword(passwordEncoder.encode(registerData.getPassword()));
+        user.setEmail(registerData.getEmail().trim());
+        user.setFirstName(trimToNull(registerData.getFirstName()));
+        user.setLastName(trimToNull(registerData.getLastName()));
+        user.setRole("USER");
+
+        User saved = userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.from(saved));
+    }
+
+    private boolean passwordMatches(User user, String rawPassword) {
+        String stored = user.getPassword();
+        if (stored == null || rawPassword == null) {
+            return false;
+        }
+
+        boolean matches = isBcryptHash(stored)
+                ? passwordEncoder.matches(rawPassword, stored)
+                : stored.equals(rawPassword);
+
+        if (matches && !isBcryptHash(stored)) {
+            user.setPassword(passwordEncoder.encode(rawPassword));
+            userRepository.save(user);
+        }
+
+        return matches;
+    }
+
+    private boolean isBcryptHash(String value) {
+        return value.startsWith("$2a$") || value.startsWith("$2b$") || value.startsWith("$2y$");
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }
