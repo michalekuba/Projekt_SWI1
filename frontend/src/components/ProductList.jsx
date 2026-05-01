@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const ProductList = ({ user }) => {
+const ProductList = ({ user, onCartChanged }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [stockEdits, setStockEdits] = useState({});
@@ -27,6 +27,16 @@ const ProductList = ({ user }) => {
         axios.delete(`http://localhost:8080/api/products/${id}`)
             .then(() => loadProducts())
             .catch(error => console.error('Chyba při mazání:', error));
+    };
+
+    const handleAddToCart = (productId) => {
+        if (!user) return;
+        axios.post(`http://localhost:8080/api/cart/${user.id}/items`, {
+            productId,
+            quantity: 1
+        })
+            .then(() => onCartChanged?.())
+            .catch(error => alert(error.response?.data || 'Pridani do kosiku selhalo.'));
     };
 
     const handleStockChange = (id, value) => {
@@ -68,6 +78,15 @@ const ProductList = ({ user }) => {
                             <div className="text-muted small mt-2">
                                 Skladem: {product.stockQuantity ?? 0} ks
                             </div>
+                            {user && (
+                                <button
+                                    className="btn btn-primary btn-sm w-100 mt-2"
+                                    onClick={() => handleAddToCart(product.id)}
+                                    disabled={(product.stockQuantity ?? 0) <= 0}
+                                >
+                                    Pridat do kosiku
+                                </button>
+                            )}
                             {user?.role === 'ADMIN' && (
                                 <div className="mt-2">
                                     <div className="input-group input-group-sm">
@@ -83,7 +102,7 @@ const ProductList = ({ user }) => {
                                             type="button"
                                             onClick={() => handleStockSave(product.id)}
                                         >
-                                            Uložit sklad
+                                            Ulozit sklad
                                         </button>
                                     </div>
                                 </div>
