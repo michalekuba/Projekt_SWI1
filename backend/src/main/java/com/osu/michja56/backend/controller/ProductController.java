@@ -1,6 +1,7 @@
 package com.osu.michja56.backend.controller;
 
 import com.osu.michja56.backend.dto.StockUpdateRequest;
+import com.osu.michja56.backend.dto.ProductUpdateRequest;
 import com.osu.michja56.backend.model.Product;
 import com.osu.michja56.backend.service.ProductService;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,27 @@ public class ProductController {
     @PostMapping
     public Product createProduct(@RequestBody Product product) {
         return productService.createProduct(product);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateRequest request) {
+        if (request == null
+                || request.getName() == null || request.getName().isBlank()
+                || request.getPrice() == null
+                || request.getStockQuantity() == null || request.getStockQuantity() < 0) {
+            return ResponseEntity.badRequest().body("Neplatná data produktu.");
+        }
+
+        Product update = new Product();
+        update.setName(request.getName());
+        update.setDescription(request.getDescription());
+        update.setPrice(request.getPrice());
+        update.setStockQuantity(request.getStockQuantity());
+        update.setImageUrl(request.getImageUrl());
+
+        return productService.updateProduct(id, update)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/{id}/stock")

@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 import ProductList from './components/ProductList';
 import Login from './components/Login'; // Import nového Loginu
 import Cart from './components/Cart';
@@ -9,6 +10,7 @@ import AdminOrders from './components/AdminOrders';
 import UserOrders from './components/UserOrders';
 import BillingProfile from './components/BillingProfile';
 import Checkout from './components/Checkout';
+import AddProductForm from './components/AddProductForm';
 
 function App() {
     const [user, setUser] = useState(null);
@@ -16,6 +18,9 @@ function App() {
     const [cartRefreshKey, setCartRefreshKey] = useState(0);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [activePage, setActivePage] = useState('products');
+    const [cartCount, setCartCount] = useState(0);
+    const [adminProductsRefreshKey, setAdminProductsRefreshKey] = useState(0);
+    const [adminProductToEdit, setAdminProductToEdit] = useState(null);
 
     const isAdmin = user?.role === 'ADMIN';
     const isUser = user?.role === 'USER';
@@ -39,6 +44,10 @@ function App() {
             pageName = 'Objednávky';
         } else if (activePage === 'user-orders') {
             pageName = 'Moje objednávky';
+        } else if (activePage === 'admin-add-product') {
+            pageName = 'Přidat produkt';
+        } else if (activePage === 'admin-edit-product') {
+            pageName = 'Upravit produkt';
         }
         document.title = `IT-shop | ${pageName}`;
     }, [showLogin, activePage, user]);
@@ -57,83 +66,121 @@ function App() {
         setUser(updatedUser);
     };
 
+    const handleGoHome = () => {
+        setShowLogin(false);
+        setActivePage('products');
+    };
+
+    const handleShowLogin = () => {
+        setShowLogin(true);
+    };
+
+    const handleAdminProductSaved = () => {
+        setAdminProductsRefreshKey(k => k + 1);
+        setActivePage('admin-products');
+        setAdminProductToEdit(null);
+    };
+
     return (
         <div className="min-vh-100 d-flex flex-column bg-light">
-            <nav className="navbar navbar-expand-lg bg-white border-bottom shadow-sm py-3">
+            <nav className="navbar navbar-expand-lg bg-white border-bottom shadow-sm">
                 <div className="container-fluid px-4 px-lg-5">
-                    <div className="d-flex align-items-center gap-3">
-                        <span className="navbar-brand mb-0 h4 text-dark d-flex align-items-center gap-2">
+                    <div className="d-flex align-items-center">
+                        <button
+                            type="button"
+                            className="navbar-brand mb-0 h4 text-dark d-flex align-items-center gap-2 btn btn-link p-0 text-decoration-none"
+                            onClick={handleGoHome}
+                        >
                             <img src="/icon.png" alt="IT-shop" width="28" height="28" className="rounded" />
                             IT-shop
-                        </span>
-                        {user ? (
-                            <div className="d-flex align-items-center gap-2">
-                                {isAdmin ? (
-                                    <>
+                        </button>
+                        <ul className="navbar-nav ms-3">
+                            <li className="nav-item">
+                                <button
+                                    className={`nav-link ${activePage === 'products' && !showLogin ? 'active fw-semibold' : ''}`}
+                                    type="button"
+                                    onClick={handleGoHome}
+                                >
+                                    Produkty
+                                </button>
+                            </li>
+                            {isAdmin && (
+                                <>
+                                    <li className="nav-item">
                                         <button
-                                            className={`btn btn-outline-dark btn-sm ${activePage === 'admin-products' ? 'active' : ''}`}
+                                            className={`nav-link ${activePage === 'admin-products' ? 'active fw-semibold' : ''}`}
+                                            type="button"
                                             onClick={() => setActivePage('admin-products')}
                                         >
                                             Sklad
                                         </button>
+                                    </li>
+                                    <li className="nav-item">
                                         <button
-                                            className={`btn btn-outline-dark btn-sm ${activePage === 'admin-orders' ? 'active' : ''}`}
+                                            className={`nav-link ${activePage === 'admin-orders' ? 'active fw-semibold' : ''}`}
+                                            type="button"
                                             onClick={() => setActivePage('admin-orders')}
                                         >
                                             Objednávky
                                         </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <button
-                                            className={`btn btn-outline-dark btn-sm ${activePage === 'products' ? 'active' : ''}`}
-                                            onClick={() => setActivePage('products')}
-                                        >
-                                            Produkty
-                                        </button>
-                                        <button
-                                            className={`btn btn-outline-dark btn-sm ${activePage === 'user-orders' ? 'active' : ''}`}
-                                            onClick={() => setActivePage('user-orders')}
-                                        >
-                                            Objednávky
-                                        </button>
-                                        <button
-                                            className={`btn btn-outline-dark btn-sm ${activePage === 'cart' ? 'active' : ''}`}
-                                            onClick={() => setActivePage('cart')}
-                                        >
-                                            Košík
-                                        </button>
-                                    </>
+                                    </li>
+                                </>
+                            )}
+                        </ul>
+                    </div>
+                    <div className="d-flex align-items-center gap-3">
+                        {isUser && (
+                            <button
+                                className={`nav-link d-flex align-items-center gap-2 ${activePage === 'cart' ? 'active fw-semibold' : ''}`}
+                                type="button"
+                                onClick={() => setActivePage('cart')}
+                            >
+                                <span aria-hidden="true">🛒</span>
+                                Košík
+                                {cartCount > 0 && (
+                                    <span className="badge text-bg-dark rounded-pill">
+                                        {cartCount}
+                                    </span>
                                 )}
-                            </div>
-                        ) : (
-                            <button className="btn btn-outline-dark btn-sm" onClick={() => setActivePage('products')}>
-                                Produkty
                             </button>
                         )}
-                    </div>
-                    <div>
                         {user ? (
-                            <div className="position-relative">
+                            <div className="d-flex align-items-center gap-2 position-relative">
+                                <span className="fw-semibold">{user.firstName} {user.lastName}</span>
                                 <button
                                     className="btn btn-outline-dark btn-sm"
                                     type="button"
                                     onClick={() => setShowUserMenu((current) => !current)}
+                                    aria-label="Uživatelské menu"
                                 >
-                                    <strong>{user.firstName} {user.lastName}</strong>
+                                    ⋯
                                 </button>
                                 {showUserMenu && (
-                                    <div className="dropdown-menu dropdown-menu-end show shadow-sm" style={{ position: 'absolute', right: 0 }}>
-                                        <button
-                                            className="dropdown-item"
-                                            type="button"
-                                            onClick={() => {
-                                                setActivePage('profile');
-                                                setShowUserMenu(false);
-                                            }}
-                                        >
-                                            Fakturační údaje
-                                        </button>
+                                    <div className="dropdown-menu dropdown-menu-end show shadow-sm" style={{ position: 'absolute', right: 0, top: 'calc(100% + 8px)' }}>
+                                        {isUser && (
+                                            <button
+                                                className="dropdown-item"
+                                                type="button"
+                                                onClick={() => {
+                                                    setActivePage('user-orders');
+                                                    setShowUserMenu(false);
+                                                }}
+                                            >
+                                                Moje objednávky
+                                            </button>
+                                        )}
+                                        {isUser && (
+                                            <button
+                                                className="dropdown-item"
+                                                type="button"
+                                                onClick={() => {
+                                                    setActivePage('profile');
+                                                    setShowUserMenu(false);
+                                                }}
+                                            >
+                                                Fakturační údaje
+                                            </button>
+                                        )}
                                         <button
                                             className="dropdown-item"
                                             type="button"
@@ -144,15 +191,6 @@ function App() {
                                         >
                                             Změna hesla
                                         </button>
-                                        {isAdmin && (
-                                            <button
-                                                className="dropdown-item"
-                                                type="button"
-                                                onClick={() => setActivePage('admin-products')}
-                                            >
-                                                Sklad
-                                            </button>
-                                        )}
                                         <div className="dropdown-divider"></div>
                                         <button
                                             className="dropdown-item text-danger"
@@ -169,9 +207,11 @@ function App() {
                                 )}
                             </div>
                         ) : (
-                            <button className="btn btn-primary btn-sm" onClick={() => setShowLogin(!showLogin)}>
-                                {showLogin ? "Zpět na produkty" : "Přihlásit se"}
-                            </button>
+                            !showLogin && (
+                                <button className="btn btn-primary btn-sm" onClick={handleShowLogin}>
+                                    Přihlásit se
+                                </button>
+                            )
                         )}
                     </div>
                 </div>
@@ -203,7 +243,30 @@ function App() {
                             <BillingProfile user={user} onProfileUpdated={handleProfileUpdated} />
                         )}
                         {isAdmin && activePage === 'admin-products' && (
-                            <AdminProducts />
+                            <AdminProducts
+                                refreshKey={adminProductsRefreshKey}
+                                onAddProduct={() => setActivePage('admin-add-product')}
+                                onEditProduct={(product) => {
+                                    setAdminProductToEdit(product);
+                                    setActivePage('admin-edit-product');
+                                }}
+                            />
+                        )}
+                        {isAdmin && activePage === 'admin-add-product' && (
+                            <AddProductForm
+                                mode="create"
+                                onProductSaved={handleAdminProductSaved}
+                                onCancel={() => setActivePage('admin-products')}
+                            />
+                        )}
+                        {isAdmin && activePage === 'admin-edit-product' && adminProductToEdit && (
+                            <AddProductForm
+                                mode="edit"
+                                initialProduct={adminProductToEdit}
+                                onProductSaved={handleAdminProductSaved}
+                                onProductDeleted={handleAdminProductSaved}
+                                onCancel={() => setActivePage('admin-products')}
+                            />
                         )}
                         {isAdmin && activePage === 'admin-orders' && (
                             <AdminOrders user={user} />
@@ -211,7 +274,7 @@ function App() {
                         {isUser && activePage === 'user-orders' && (
                             <UserOrders user={user} />
                         )}
-                        {(isGuest || isUser) && activePage === 'products' && (
+                        {(isGuest || isUser || isAdmin) && activePage === 'products' && (
                             <div>
                                 <h2 className="fw-light mb-4">Naše nabídka</h2>
                                 <ProductList
@@ -234,4 +297,3 @@ function App() {
 }
 
 export default App;
-

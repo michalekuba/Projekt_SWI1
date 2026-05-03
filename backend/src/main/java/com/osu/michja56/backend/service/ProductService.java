@@ -37,4 +37,15 @@ public class    ProductService {
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
+
+    public Optional<Product> updateProduct(Long id, Product update) {
+        return productRepository.findById(id).map(product -> {
+            product.setName(update.getName());
+            product.setDescription(update.getDescription());
+            product.setPrice(update.getPrice());
+            product.setStockQuantity(update.getStockQuantity());
+            product.setImageUrl(update.getImageUrl());
+            return productRepository.save(product);
+        });
+    }
 }
