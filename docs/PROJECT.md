@@ -325,6 +325,85 @@ sequenceDiagram
 
 ---
 
+## Class diagram (Mermaid)
+
+```mermaid
+classDiagram
+  class User {
+    Long id
+    String username
+    String password
+    String firstName
+    String lastName
+    String street
+    String city
+    String postalCode
+    String email
+    String phone
+    String role
+  }
+
+  class Product {
+    Long id
+    String name
+    String description
+    BigDecimal price
+    Integer stockQuantity
+    String imageUrl
+  }
+
+  class Cart {
+    Long id
+    LocalDateTime createdAt
+  }
+
+  class CartItem {
+    Long id
+    Integer quantity
+    BigDecimal priceAtAdd
+  }
+
+  class Order {
+    Long id
+    BigDecimal total
+    String status
+    String billingFirstName
+    String billingLastName
+    String billingStreet
+    String billingCity
+    String billingPostalCode
+    String billingEmail
+    String billingPhone
+    String shippingMethod
+    LocalDateTime createdAt
+  }
+
+  class OrderItem {
+    Long id
+    Integer quantity
+    BigDecimal priceAtOrder
+    BigDecimal lineTotal
+  }
+
+  User "1" --> "1" Cart : owns
+  Cart "1" --> "*" CartItem : contains
+  CartItem "*" --> "1" Product : product
+
+  User "1" --> "*" Order : places
+  Order "1" --> "*" OrderItem : contains
+  OrderItem "*" --> "1" Product : product
+```
+
+---
+
+## Unit testy
+
+- `backend/src/test/java/com/osu/michja56/backend/BackendApplicationTests.java` — základní kontrola, že Spring kontext aplikace se načte bez chyby.
+- `backend/src/test/java/com/osu/michja56/backend/service/ProductServiceTest.java` — unit testy nad `ProductService` s mockovaným `ProductRepository`; ověřuje načtení produktů, vyhledání podle ID, vytvoření produktu a smazání.
+- `backend/src/test/java/com/osu/michja56/backend/service/OrderServiceTest.java` — integrační test `OrderService` se skutečnými repozitáři a transakcemi; zakládá uživatele, produkt a košík, vytváří objednávku, kontroluje vymazání košíku a odečtení skladu.
+
+---
+
 ## Deployment diagram (Mermaid)
 
 ```mermaid
@@ -343,4 +422,3 @@ flowchart TD
 
   F -->|HTTP/JSON| S
 ```
-
