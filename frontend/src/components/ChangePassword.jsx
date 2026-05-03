@@ -37,7 +37,7 @@ const ChangePassword = ({ user }) => {
     if (!user) return null;
 
     return (
-        <div className="card shadow-sm mb-4">
+        <div className="card shadow-sm mb-4 form-card">
             <div className="card-body">
                 <h3 className="card-title h5 mb-3">Změna hesla</h3>
                 {error && <div className="alert alert-danger">{error}</div>}

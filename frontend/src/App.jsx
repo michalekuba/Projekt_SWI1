@@ -58,23 +58,26 @@ function App() {
     };
 
     return (
-        <div className="min-vh-100 bg-light pb-5">
-            <nav className="navbar navbar-dark bg-dark mb-4 shadow">
-                <div className="container">
-                    <span className="navbar-brand mb-0 h1">IT-shop</span>
-                    <div>
+        <div className="min-vh-100 d-flex flex-column bg-light">
+            <nav className="navbar navbar-expand-lg bg-white border-bottom shadow-sm py-3">
+                <div className="container-fluid px-4 px-lg-5">
+                    <div className="d-flex align-items-center gap-3">
+                        <span className="navbar-brand mb-0 h4 text-dark d-flex align-items-center gap-2">
+                            <img src="/icon.png" alt="IT-shop" width="28" height="28" className="rounded" />
+                            IT-shop
+                        </span>
                         {user ? (
                             <div className="d-flex align-items-center gap-2">
                                 {isAdmin ? (
                                     <>
                                         <button
-                                            className={`btn btn-outline-light btn-sm ${activePage === 'admin-products' ? 'active' : ''}`}
+                                            className={`btn btn-outline-dark btn-sm ${activePage === 'admin-products' ? 'active' : ''}`}
                                             onClick={() => setActivePage('admin-products')}
                                         >
                                             Sklad
                                         </button>
                                         <button
-                                            className={`btn btn-outline-light btn-sm ${activePage === 'admin-orders' ? 'active' : ''}`}
+                                            className={`btn btn-outline-dark btn-sm ${activePage === 'admin-orders' ? 'active' : ''}`}
                                             onClick={() => setActivePage('admin-orders')}
                                         >
                                             Objednávky
@@ -83,79 +86,87 @@ function App() {
                                 ) : (
                                     <>
                                         <button
-                                            className={`btn btn-outline-light btn-sm ${activePage === 'products' ? 'active' : ''}`}
+                                            className={`btn btn-outline-dark btn-sm ${activePage === 'products' ? 'active' : ''}`}
                                             onClick={() => setActivePage('products')}
                                         >
                                             Produkty
                                         </button>
                                         <button
-                                            className={`btn btn-outline-light btn-sm ${activePage === 'user-orders' ? 'active' : ''}`}
+                                            className={`btn btn-outline-dark btn-sm ${activePage === 'user-orders' ? 'active' : ''}`}
                                             onClick={() => setActivePage('user-orders')}
                                         >
                                             Objednávky
                                         </button>
                                         <button
-                                            className={`btn btn-outline-light btn-sm ${activePage === 'cart' ? 'active' : ''}`}
+                                            className={`btn btn-outline-dark btn-sm ${activePage === 'cart' ? 'active' : ''}`}
                                             onClick={() => setActivePage('cart')}
                                         >
                                             Košík
                                         </button>
                                     </>
                                 )}
-                                <div className="position-relative">
-                                    <button
-                                        className="btn btn-outline-light btn-sm"
-                                        type="button"
-                                        onClick={() => setShowUserMenu((current) => !current)}
-                                    >
-                                        {user.username}
-                                    </button>
-                                    {showUserMenu && (
-                                        <div className="dropdown-menu dropdown-menu-end show" style={{ position: 'absolute', right: 0 }}>
+                            </div>
+                        ) : (
+                            <button className="btn btn-outline-dark btn-sm" onClick={() => setActivePage('products')}>
+                                Produkty
+                            </button>
+                        )}
+                    </div>
+                    <div>
+                        {user ? (
+                            <div className="position-relative">
+                                <button
+                                    className="btn btn-outline-dark btn-sm"
+                                    type="button"
+                                    onClick={() => setShowUserMenu((current) => !current)}
+                                >
+                                    <strong>{user.firstName} {user.lastName}</strong>
+                                </button>
+                                {showUserMenu && (
+                                    <div className="dropdown-menu dropdown-menu-end show shadow-sm" style={{ position: 'absolute', right: 0 }}>
+                                        <button
+                                            className="dropdown-item"
+                                            type="button"
+                                            onClick={() => {
+                                                setActivePage('profile');
+                                                setShowUserMenu(false);
+                                            }}
+                                        >
+                                            Fakturační údaje
+                                        </button>
+                                        <button
+                                            className="dropdown-item"
+                                            type="button"
+                                            onClick={() => {
+                                                setActivePage('change-password');
+                                                setShowUserMenu(false);
+                                            }}
+                                        >
+                                            Změna hesla
+                                        </button>
+                                        {isAdmin && (
                                             <button
                                                 className="dropdown-item"
                                                 type="button"
-                                                onClick={() => {
-                                                    setActivePage('profile');
-                                                    setShowUserMenu(false);
-                                                }}
+                                                onClick={() => setActivePage('admin-products')}
                                             >
-                                                Fakturační údaje
+                                                Sklad
                                             </button>
-                                            <button
-                                                className="dropdown-item"
-                                                type="button"
-                                                onClick={() => {
-                                                    setActivePage('change-password');
-                                                    setShowUserMenu(false);
-                                                }}
-                                            >
-                                                Změna hesla
-                                            </button>
-                                            {isAdmin && (
-                                                <button
-                                                    className="dropdown-item"
-                                                    type="button"
-                                                    onClick={() => setActivePage('admin-products')}
-                                                >
-                                                    Sklad
-                                                </button>
-                                            )}
-                                            <div className="dropdown-divider"></div>
-                                            <button
-                                                className="dropdown-item text-danger"
-                                                type="button"
-                                                onClick={() => {
-                                                    setUser(null);
-                                                    setActivePage('products');
-                                                    setShowUserMenu(false);
-                                                }}
-                                            >
-                                                Odhlásit
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
+                                        )}
+                                        <div className="dropdown-divider"></div>
+                                        <button
+                                            className="dropdown-item text-danger"
+                                            type="button"
+                                            onClick={() => {
+                                                setUser(null);
+                                                setActivePage('products');
+                                                setShowUserMenu(false);
+                                            }}
+                                        >
+                                            Odhlásit
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <button className="btn btn-primary btn-sm" onClick={() => setShowLogin(!showLogin)}>
@@ -166,7 +177,7 @@ function App() {
                 </div>
             </nav>
 
-            <div className="container">
+            <main className="container-xxl py-4 flex-grow-1">
                 {showLogin && !user ? (
                     <Login onLoginSuccess={handleLoginSuccess} />
                 ) : (
@@ -212,12 +223,15 @@ function App() {
                         )}
                     </div>
                 )}
-            </div>
-            <footer className="text-center text-muted py-4 mt-5 border-top">
-                <small>© 2026 IT-shop · Vytvořeno v rámci předmětu SWI1</small>
+            </main>
+            <footer className="bg-white border-top py-3 mt-auto">
+                <div className="container-xxl text-center text-muted">
+                    <small>© 2026 IT-shop · Vytvořeno v rámci předmětu SWI1</small>
+                </div>
             </footer>
         </div>
     );
 }
 
 export default App;
+
