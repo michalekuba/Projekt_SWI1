@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const Cart = ({ user, refreshKey, onCartChanged }) => {
+const Cart = ({ user, refreshKey, onCartChanged, onCheckout }) => {
     const [cart, setCart] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -107,6 +107,17 @@ const Cart = ({ user, refreshKey, onCartChanged }) => {
                             <span>Celková cena</span>
                             <span>{Number(cart.total).toLocaleString('cs-CZ')} Kč</span>
                         </div>
+                        {user?.role === 'USER' && (
+                            <div className="mt-3">
+                                <button
+                                    className="btn btn-primary w-100"
+                                    type="button"
+                                    onClick={onCheckout}
+                                >
+                                    Pokračovat k objednávce
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

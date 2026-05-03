@@ -44,6 +44,12 @@ public class DataInitializer {
                 admin.setUsername("admin");
                 admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setEmail("admin@eshop.cz");
+                admin.setFirstName("Admin");
+                admin.setLastName("Správce");
+                admin.setStreet("Hlavní 1");
+                admin.setCity("Praha");
+                admin.setPostalCode("11000");
+                admin.setPhone("+420777000111");
                 admin.setRole("ADMIN");
                 userRepo.save(admin);
 
@@ -52,6 +58,12 @@ public class DataInitializer {
                 user.setUsername("pepa");
                 user.setPassword(passwordEncoder.encode("pepa123"));
                 user.setEmail("pepa@email.cz");
+                user.setFirstName("Pepa");
+                user.setLastName("Novák");
+                user.setStreet("Ulice 12");
+                user.setCity("Brno");
+                user.setPostalCode("60200");
+                user.setPhone("+420777000222");
                 user.setRole("USER");
                 userRepo.save(user);
 

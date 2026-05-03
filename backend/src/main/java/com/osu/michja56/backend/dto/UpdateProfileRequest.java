@@ -3,15 +3,13 @@ package com.osu.michja56.backend.dto;
 import lombok.Data;
 
 @Data
-public class RegisterRequest {
+public class UpdateProfileRequest {
 
-    private String username;
-    private String password;
-    private String email;
     private String firstName;
     private String lastName;
     private String street;
     private String city;
     private String postalCode;
+    private String email;
     private String phone;
 }

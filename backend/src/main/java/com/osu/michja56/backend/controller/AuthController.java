@@ -42,8 +42,14 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest registerData) {
         if (!StringUtils.hasText(registerData.getUsername())
                 || !StringUtils.hasText(registerData.getPassword())
-                || !StringUtils.hasText(registerData.getEmail())) {
-            return ResponseEntity.badRequest().body("Vyplňte uživatelské jméno, e-mail a heslo.");
+                || !StringUtils.hasText(registerData.getEmail())
+                || !StringUtils.hasText(registerData.getFirstName())
+                || !StringUtils.hasText(registerData.getLastName())
+                || !StringUtils.hasText(registerData.getStreet())
+                || !StringUtils.hasText(registerData.getCity())
+                || !StringUtils.hasText(registerData.getPostalCode())
+                || !StringUtils.hasText(registerData.getPhone())) {
+            return ResponseEntity.badRequest().body("Vyplňte jméno, příjmení, ulici, město, PSČ, e-mail, telefon, uživatelské jméno a heslo.");
         }
 
         if (userRepository.findByUsername(registerData.getUsername()).isPresent()) {
@@ -58,8 +64,12 @@ public class AuthController {
         user.setUsername(registerData.getUsername().trim());
         user.setPassword(passwordEncoder.encode(registerData.getPassword()));
         user.setEmail(registerData.getEmail().trim());
-        user.setFirstName(trimToNull(registerData.getFirstName()));
-        user.setLastName(trimToNull(registerData.getLastName()));
+        user.setFirstName(registerData.getFirstName().trim());
+        user.setLastName(registerData.getLastName().trim());
+        user.setStreet(registerData.getStreet().trim());
+        user.setCity(registerData.getCity().trim());
+        user.setPostalCode(registerData.getPostalCode().trim());
+        user.setPhone(registerData.getPhone().trim());
         user.setRole("USER");
 
         User saved = userRepository.save(user);

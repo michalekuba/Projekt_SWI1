@@ -7,9 +7,14 @@ const Login = ({ onLoginSuccess }) => {
     const [registerData, setRegisterData] = useState({
         username: '',
         password: '',
+        confirmPassword: '',
         email: '',
         firstName: '',
-        lastName: ''
+        lastName: '',
+        street: '',
+        city: '',
+        postalCode: '',
+        phone: ''
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -30,7 +35,12 @@ const Login = ({ onLoginSuccess }) => {
     const handleRegister = (e) => {
         e.preventDefault();
         setError('');
-        axios.post('http://localhost:8080/api/auth/register', registerData)
+        if (registerData.password !== registerData.confirmPassword) {
+            setError('Hesla se neshodují.');
+            return;
+        }
+        const { confirmPassword, ...payload } = registerData;
+        axios.post('http://localhost:8080/api/auth/register', payload)
             .then(response => {
                 setSuccess('Registrace proběhla úspěšně.');
                 onLoginSuccess(response.data);
@@ -101,6 +111,48 @@ const Login = ({ onLoginSuccess }) => {
                             />
                         </div>
                         <div className="mb-3">
+                            <label className="form-label">Jméno</label>
+                            <input
+                                type="text" className="form-control" required
+                                onChange={e => setRegisterData({...registerData, firstName: e.target.value})}
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Příjmení</label>
+                            <input
+                                type="text" className="form-control" required
+                                onChange={e => setRegisterData({...registerData, lastName: e.target.value})}
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Ulice</label>
+                            <input
+                                type="text" className="form-control" required
+                                onChange={e => setRegisterData({...registerData, street: e.target.value})}
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Město</label>
+                            <input
+                                type="text" className="form-control" required
+                                onChange={e => setRegisterData({...registerData, city: e.target.value})}
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">PSČ</label>
+                            <input
+                                type="text" className="form-control" required
+                                onChange={e => setRegisterData({...registerData, postalCode: e.target.value})}
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Telefon</label>
+                            <input
+                                type="tel" className="form-control" required
+                                onChange={e => setRegisterData({...registerData, phone: e.target.value})}
+                            />
+                        </div>
+                        <div className="mb-3">
                             <label className="form-label">Heslo</label>
                             <input
                                 type="password" className="form-control" required
@@ -108,17 +160,10 @@ const Login = ({ onLoginSuccess }) => {
                             />
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Jméno</label>
+                            <label className="form-label">Potvrzení hesla</label>
                             <input
-                                type="text" className="form-control"
-                                onChange={e => setRegisterData({...registerData, firstName: e.target.value})}
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Příjmení</label>
-                            <input
-                                type="text" className="form-control"
-                                onChange={e => setRegisterData({...registerData, lastName: e.target.value})}
+                                type="password" className="form-control" required
+                                onChange={e => setRegisterData({...registerData, confirmPassword: e.target.value})}
                             />
                         </div>
                         <button type="submit" className="btn btn-primary w-100">Zaregistrovat se</button>
