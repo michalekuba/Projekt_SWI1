@@ -4,6 +4,7 @@ import ProductList from './components/ProductList';
 import AddProductForm from './components/AddProductForm';
 import Login from './components/Login'; // Import nového Loginu
 import Cart from './components/Cart';
+import ChangePassword from './components/ChangePassword';
 
 function App() {
     const [user, setUser] = useState(null);
@@ -55,6 +56,7 @@ function App() {
                                 {user?.role === 'ADMIN' && (
                                     <AddProductForm onProductAdded={() => setRefreshKey(k => k + 1)} />
                                 )}
+                                <ChangePassword user={user} />
                                 <Cart user={user} refreshKey={cartRefreshKey} onCartChanged={() => setCartRefreshKey(k => k + 1)} />
                             </div>
                         )}

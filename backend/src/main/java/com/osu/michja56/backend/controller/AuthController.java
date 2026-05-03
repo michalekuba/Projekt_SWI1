@@ -3,6 +3,7 @@ package com.osu.michja56.backend.controller;
 import com.osu.michja56.backend.dto.LoginRequest;
 import com.osu.michja56.backend.dto.RegisterRequest;
 import com.osu.michja56.backend.dto.UserResponse;
+import com.osu.michja56.backend.dto.ChangePasswordRequest;
 import com.osu.michja56.backend.model.User;
 import com.osu.michja56.backend.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -63,6 +64,36 @@ public class AuthController {
 
         User saved = userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.from(saved));
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        if (request == null
+                || request.getUserId() == null
+                || !StringUtils.hasText(request.getCurrentPassword())
+                || !StringUtils.hasText(request.getNewPassword())) {
+            return ResponseEntity.badRequest().body("Vyplňte aktuální a nové heslo.");
+        }
+
+        Optional<User> userOpt = userRepository.findById(request.getUserId());
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Uživatel neexistuje.");
+        }
+
+        User user = userOpt.get();
+        if (!passwordMatches(user, request.getCurrentPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Aktuální heslo není správné.");
+        }
+
+        String newPassword = request.getNewPassword().trim();
+        if (newPassword.length() < 6) {
+            return ResponseEntity.badRequest().body("Nové heslo musí mít alespoň 6 znaků.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Heslo bylo změněno.");
     }
 
     private boolean passwordMatches(User user, String rawPassword) {
