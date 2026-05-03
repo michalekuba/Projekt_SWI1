@@ -17,7 +17,7 @@ const Cart = ({ user, refreshKey, onCartChanged }) => {
                 setError('');
             })
             .catch(err => {
-                setError(err.response?.data || 'Kosik se nepodarilo nacist.');
+                setError(err.response?.data || 'Košík se nepodařilo načíst.');
             })
             .finally(() => setLoading(false));
     };
@@ -33,7 +33,7 @@ const Cart = ({ user, refreshKey, onCartChanged }) => {
     const handleQuantitySave = (itemId) => {
         const quantity = Number(quantityEdits[itemId]);
         if (!Number.isInteger(quantity) || quantity < 0) {
-            alert('Zadejte nezaporne cele cislo.');
+            alert('Zadejte nezáporné celé číslo.');
             return;
         }
 
@@ -42,7 +42,7 @@ const Cart = ({ user, refreshKey, onCartChanged }) => {
                 onCartChanged?.();
             })
             .catch(err => {
-                alert(err.response?.data || 'Ulozeni mnozstvi selhalo.');
+                alert(err.response?.data || 'Uložení množství selhalo.');
             });
     };
 
@@ -52,7 +52,7 @@ const Cart = ({ user, refreshKey, onCartChanged }) => {
                 onCartChanged?.();
             })
             .catch(err => {
-                alert(err.response?.data || 'Odebrani polozky selhalo.');
+                alert(err.response?.data || 'Odebrání položky selhalo.');
             });
     };
 
@@ -61,11 +61,11 @@ const Cart = ({ user, refreshKey, onCartChanged }) => {
     return (
         <div className="card shadow-sm mb-4">
             <div className="card-body">
-                <h3 className="card-title h5 mb-3">Kosik</h3>
-                {loading && <div>Loading...</div>}
+                <h3 className="card-title h5 mb-3">Košík</h3>
+                {loading && <div>Načítám...</div>}
                 {error && <div className="alert alert-danger">{error}</div>}
                 {!loading && !error && (!cart || cart.items.length === 0) && (
-                    <div className="text-muted">Kosik je prazdny.</div>
+                    <div className="text-muted">Košík je prázdný.</div>
                 )}
                 {!loading && !error && cart && cart.items.length > 0 && (
                     <div>
@@ -88,7 +88,7 @@ const Cart = ({ user, refreshKey, onCartChanged }) => {
                                         type="button"
                                         onClick={() => handleQuantitySave(item.id)}
                                     >
-                                        Ulozit
+                                        Uložit
                                     </button>
                                     <button
                                         className="btn btn-outline-danger"
@@ -104,7 +104,7 @@ const Cart = ({ user, refreshKey, onCartChanged }) => {
                             </div>
                         ))}
                         <div className="d-flex justify-content-between fw-semibold mt-3">
-                            <span>Celkova cena</span>
+                            <span>Celková cena</span>
                             <span>{Number(cart.total).toLocaleString('cs-CZ')} Kč</span>
                         </div>
                     </div>

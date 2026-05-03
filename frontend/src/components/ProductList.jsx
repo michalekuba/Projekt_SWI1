@@ -36,7 +36,7 @@ const ProductList = ({ user, onCartChanged }) => {
             quantity: 1
         })
             .then(() => onCartChanged?.())
-            .catch(error => alert(error.response?.data || 'Pridani do kosiku selhalo.'));
+            .catch(error => alert(error.response?.data || 'Přidání do košíku selhalo.'));
     };
 
     const handleStockChange = (id, value) => {
@@ -84,7 +84,7 @@ const ProductList = ({ user, onCartChanged }) => {
                                     onClick={() => handleAddToCart(product.id)}
                                     disabled={(product.stockQuantity ?? 0) <= 0}
                                 >
-                                    Pridat do kosiku
+                                    Přidat do košíku
                                 </button>
                             )}
                             {user?.role === 'ADMIN' && (
@@ -102,7 +102,7 @@ const ProductList = ({ user, onCartChanged }) => {
                                             type="button"
                                             onClick={() => handleStockSave(product.id)}
                                         >
-                                            Ulozit sklad
+                                            Uložit sklad
                                         </button>
                                     </div>
                                 </div>
