@@ -331,7 +331,7 @@ sequenceDiagram
 flowchart TD
   subgraph Klient
     B[Prohlížeč]
-    F[React SPA (Vite)]
+    F[React SPA - Vite]
     B --> F
   end
 
