@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ProductList from './components/ProductList';
 import AddProductForm from './components/AddProductForm';
@@ -11,11 +11,16 @@ function App() {
     const [showLogin, setShowLogin] = useState(false);
     const [cartRefreshKey, setCartRefreshKey] = useState(0);
 
+    useEffect(() => {
+        const pageName = showLogin && !user ? 'Přihlášení' : 'Produkty';
+        document.title = `IT-shop | ${pageName}`;
+    }, [showLogin, user]);
+
     return (
         <div className="min-vh-100 bg-light pb-5">
             <nav className="navbar navbar-dark bg-dark mb-4 shadow">
                 <div className="container">
-                    <span className="navbar-brand mb-0 h1">Můj E-shop</span>
+                    <span className="navbar-brand mb-0 h1">IT-shop</span>
                     <div>
                         {user ? (
                             <div className="text-light">
@@ -57,7 +62,7 @@ function App() {
                 )}
             </div>
             <footer className="text-center text-muted py-4 mt-5 border-top">
-                <small>© 2026 Můj E-shop · Vytvořeno v rámci předmětu SWI1</small>
+                <small>© 2026 IT-shop · Vytvořeno v rámci předmětu SWI1</small>
             </footer>
         </div>
     );
