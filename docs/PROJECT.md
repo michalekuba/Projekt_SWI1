@@ -8,17 +8,17 @@ IT‑shop je webový e‑shop s rolemi USER/ADMIN. Uživatelé prohlížejí pro
 
 ## Backend – soubory a metody
 
-### `backend/src/main/java/com/osu/michja56/backend/BackendApplication.java`
+### `backend/BackendApplication.java`
 - `main(String[] args)`: spouští Spring Boot aplikaci.
 
-### `backend/src/main/java/com/osu/michja56/backend/config/DataInitializer.java`
+### `backend/config/DataInitializer.java`
 - `initDatabase(ProductRepository, UserRepository)`: při startu vytvoří základní produkty a uživatele (admin + user), pokud je databáze prázdná.
 
 ---
 
 ### Controllers
 
-**`backend/src/main/java/com/osu/michja56/backend/controller/AuthController.java`**
+**`backend/controller/AuthController.java`**
 - `login(LoginRequest)`: ověří přihlašovací údaje, vrací `UserResponse` nebo 401.
 - `register(RegisterRequest)`: validuje registraci, kontroluje unikátní username/email, ukládá uživatele s rolí USER.
 - `changePassword(ChangePasswordRequest)`: ověří aktuální heslo a nastaví nové (min. 6 znaků).
@@ -26,23 +26,23 @@ IT‑shop je webový e‑shop s rolemi USER/ADMIN. Uživatelé prohlížejí pro
 - `isBcryptHash(String)`: detekuje bcrypt hash.
 - `trimToNull(String)`: pomocná metoda pro trim/null (aktuálně nepoužitá).
 
-**`backend/src/main/java/com/osu/michja56/backend/controller/UserController.java`**
+**`backend/controller/UserController.java`**
 - `updateProfile(Long, UpdateProfileRequest)`: aktualizuje fakturační údaje uživatele, validuje vstupy a unikátnost e‑mailu.
 
-**`backend/src/main/java/com/osu/michja56/backend/controller/ProductController.java`**
+**`backend/controller/ProductController.java`**
 - `getAllProducts()`: vrací seznam produktů.
 - `createProduct(Product)`: vytvoří nový produkt.
 - `updateProduct(Long, ProductUpdateRequest)`: upraví celý produkt (název, popis, cena, sklad, obrázek).
 - `updateStock(Long, StockUpdateRequest)`: upraví pouze sklad.
 - `deleteProduct(Long)`: smaže produkt.
 
-**`backend/src/main/java/com/osu/michja56/backend/controller/CartController.java`**
+**`backend/controller/CartController.java`**
 - `getCart(Long)`: načte košík uživatele.
 - `addItem(Long, AddToCartRequest)`: přidá položku do košíku.
 - `updateItem(Long, Long, UpdateCartItemRequest)`: změní množství v košíku.
 - `removeItem(Long, Long)`: odebere položku z košíku.
 
-**`backend/src/main/java/com/osu/michja56/backend/controller/OrderController.java`**
+**`backend/controller/OrderController.java`**
 - `createOrderFromCart(Long, OrderCreateRequest)`: vytvoří objednávku z košíku.
 - `getOrders(Long)`: vrací objednávky uživatele.
 - `getAllOrders(Long)`: vrací všechny objednávky (ADMIN).
@@ -52,7 +52,7 @@ IT‑shop je webový e‑shop s rolemi USER/ADMIN. Uživatelé prohlížejí pro
 
 ### Services
 
-**`backend/src/main/java/com/osu/michja56/backend/service/ProductService.java`**
+**`backend/service/ProductService.java`**
 - `getAllProducts()`: načte všechny produkty.
 - `getProductById(Long)`: vyhledá produkt podle ID.
 - `createProduct(Product)`: uloží nový produkt.
@@ -60,7 +60,7 @@ IT‑shop je webový e‑shop s rolemi USER/ADMIN. Uživatelé prohlížejí pro
 - `deleteProduct(Long)`: smaže produkt.
 - `updateProduct(Long, Product)`: upraví celý produkt.
 
-**`backend/src/main/java/com/osu/michja56/backend/service/CartService.java`**
+**`backend/service/CartService.java`**
 - `getCart(Long)`: vrací košík uživatele (vytvoří, pokud neexistuje).
 - `addItem(Long, Long, int)`: přidá nebo navýší položku; kontroluje sklad.
 - `updateItemQuantity(Long, Long, int)`: upraví množství (0 → smazání).
@@ -69,7 +69,7 @@ IT‑shop je webový e‑shop s rolemi USER/ADMIN. Uživatelé prohlížejí pro
 - `ensureStockAvailable(Product, int)`: hlídá dostupnost skladu.
 - `buildResponse(Cart)`: mapuje `Cart` → `CartResponse`.
 
-**`backend/src/main/java/com/osu/michja56/backend/service/OrderService.java`**
+**`backend/service/OrderService.java`**
 - `createOrderFromCart(Long, OrderCreateRequest)`: z košíku vytvoří objednávku, odečte sklad, vymaže košík.
 - `getOrdersForUser(Long)`: vrací objednávky uživatele.
 - `getAllOrders(Long)`: vrací všechny objednávky (ADMIN).
@@ -85,27 +85,27 @@ IT‑shop je webový e‑shop s rolemi USER/ADMIN. Uživatelé prohlížejí pro
 
 ### Modely (JPA entity)
 
-**`backend/src/main/java/com/osu/michja56/backend/model/User.java`**
+**`backend/model/User.java`**
 - Pole: username, password, jméno, adresa (street/city/postalCode), email, phone, role.
 - `syncLegacyAddress()`: udržuje kompatibilní sloučenou adresu v `legacyAddress`.
 
-**`backend/src/main/java/com/osu/michja56/backend/model/Product.java`**
+**`backend/model/Product.java`**
 - Pole: name, description, price (BigDecimal), stockQuantity, imageUrl.
 
-**`backend/src/main/java/com/osu/michja56/backend/model/Cart.java`**
+**`backend/model/Cart.java`**
 - Vztahy: `@OneToOne` User, `@OneToMany` CartItem.
 - Pole: createdAt.
 
-**`backend/src/main/java/com/osu/michja56/backend/model/CartItem.java`**
+**`backend/model/CartItem.java`**
 - Vztahy: `@ManyToOne` Cart, `@ManyToOne` Product.
 - Pole: quantity, priceAtAdd.
 
-**`backend/src/main/java/com/osu/michja56/backend/model/Order.java`**
+**`backend/model/Order.java`**
 - Vztahy: `@ManyToOne` User, `@OneToMany` OrderItem.
 - Pole: total, status, billing údaje, shippingMethod, createdAt.
 - `syncLegacyBillingAddress()`: udržuje starý sloučený billing adresní řádek.
 
-**`backend/src/main/java/com/osu/michja56/backend/model/OrderItem.java`**
+**`backend/model/OrderItem.java`**
 - Vztahy: `@ManyToOne` Order, `@ManyToOne` Product.
 - Pole: quantity, priceAtOrder, lineTotal.
 
@@ -113,26 +113,26 @@ IT‑shop je webový e‑shop s rolemi USER/ADMIN. Uživatelé prohlížejí pro
 
 ### Repositories
 
-**`backend/src/main/java/com/osu/michja56/backend/repository/UserRepository.java`**
+**`backend/repository/UserRepository.java`**
 - `findByEmail(String)`
 - `findByUsername(String)`
 
-**`backend/src/main/java/com/osu/michja56/backend/repository/ProductRepository.java`**
+**`backend/repository/ProductRepository.java`**
 - standardní CRUD z `JpaRepository`.
 
-**`backend/src/main/java/com/osu/michja56/backend/repository/CartRepository.java`**
+**`backend/repository/CartRepository.java`**
 - `findByUserId(Long)`
 
-**`backend/src/main/java/com/osu/michja56/backend/repository/CartItemRepository.java`**
+**`repository/CartItemRepository.java`**
 - `findByCartId(Long)`
 - `findByCartIdAndProductId(Long, Long)`
 - `findByIdAndCartId(Long, Long)`
 
-**`backend/src/main/java/com/osu/michja56/backend/repository/OrderRepository.java`**
+**`backend/repository/OrderRepository.java`**
 - `findByUserIdOrderByCreatedAtDesc(Long)`
 - `findAllByOrderByCreatedAtDesc()`
 
-**`backend/src/main/java/com/osu/michja56/backend/repository/OrderItemRepository.java`**
+**`backend/repository/OrderItemRepository.java`**
 - standardní CRUD.
 
 ---
@@ -165,7 +165,7 @@ IT‑shop je webový e‑shop s rolemi USER/ADMIN. Uživatelé prohlížejí pro
 
 ---
 
-## Frontend – soubory (1 věta)
+## Frontend
 
 - `frontend/src/main.jsx` — vstupní bod React aplikace a mount do DOM.
 - `frontend/src/App.jsx` — hlavní layout, navigace, routování přes `activePage`, správa stavu uživatele.
@@ -398,9 +398,9 @@ classDiagram
 
 ## Unit testy
 
-- `backend/src/test/java/com/osu/michja56/backend/BackendApplicationTests.java` — základní kontrola, že Spring kontext aplikace se načte bez chyby.
-- `backend/src/test/java/com/osu/michja56/backend/service/ProductServiceTest.java` — unit testy nad `ProductService` s mockovaným `ProductRepository`; ověřuje načtení produktů, vyhledání podle ID, vytvoření produktu a smazání.
-- `backend/src/test/java/com/osu/michja56/backend/service/OrderServiceTest.java` — integrační test `OrderService` se skutečnými repozitáři a transakcemi; zakládá uživatele, produkt a košík, vytváří objednávku, kontroluje vymazání košíku a odečtení skladu.
+- `backend/BackendApplicationTests.java` — základní kontrola, že Spring kontext aplikace se načte bez chyby.
+- `backend/service/ProductServiceTest.java` — unit testy nad `ProductService` s mockovaným `ProductRepository`; ověřuje načtení produktů, vyhledání podle ID, vytvoření produktu a smazání.
+- `backend/service/OrderServiceTest.java` — integrační test `OrderService` se skutečnými repozitáři a transakcemi; zakládá uživatele, produkt a košík, vytváří objednávku, kontroluje vymazání košíku a odečtení skladu.
 
 ---
 
